@@ -1,6 +1,9 @@
+import { login } from "@/api/auth";
+import { storeToken } from "@/api/storage";
+import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +12,22 @@ import {
   View,
 } from "react-native";
 const Login = () => {
+  const [userCredentials, setUserCredentials] = useState({
+    username: "",
+    password: "",
+  });
+
+  const { mutate } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: login,
+    onSuccess: async (response) => {
+      if (response?.accessToken) await storeToken(response.accessToken);
+    },
+    onError: (err) => {
+      console.log("Something went wrong", err);
+    },
+  });
+
   return (
     <View style={styles.container}>
       <Image
@@ -19,10 +38,27 @@ const Login = () => {
       <Text style={styles.title}>Login to Your Account</Text>
       <View style={styles.fieldsContainer}>
         <Text style={styles.fieldLabel}>Username</Text>
-        <TextInput placeholder="" style={styles.textInput} />
+        <TextInput
+          placeholder=""
+          style={styles.textInput}
+          onChangeText={(text) =>
+            setUserCredentials({ ...userCredentials, username: text })
+          }
+        />
         <Text style={styles.fieldLabel}>Password</Text>
-        <TextInput placeholder="" style={styles.textInput} />
-        <TouchableOpacity style={styles.loginButton}>
+        <TextInput
+          placeholder=""
+          textContentType="password"
+          secureTextEntry
+          style={styles.textInput}
+          onChangeText={(text) =>
+            setUserCredentials({ ...userCredentials, password: text })
+          }
+        />
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => mutate(userCredentials)}
+        >
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
       </View>
@@ -76,6 +112,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 10,
     marginVertical: 5,
+    color: "#deddd1ff",
+    padding: 3,
   },
   loginButton: {
     borderRadius: 10,
