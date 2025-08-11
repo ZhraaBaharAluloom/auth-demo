@@ -16,7 +16,7 @@ const Login = () => {
   const { mutate } = useMutation({
     mutationKey: ["loginApi"],
     mutationFn: () => loginApi(userInfo),
-    onSuccess: (data) => console.log("ur logged in yippee", data),
+    onSuccess: (data) => console.log("ur logged in yippee", data.token),
     onError: (error) => console.error("login error:", error),
   });
   return (
