@@ -1,7 +1,11 @@
+import { login } from "@/api/auth";
+import AuthContext from "@/contexts/AuthContext";
+import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
+  Button,
   StyleSheet,
   Text,
   TextInput,
@@ -9,6 +13,25 @@ import {
   View,
 } from "react-native";
 const Login = () => {
+  const { setIsAuthenticated } = useContext(AuthContext);
+  const [userInfo, setUserInfo] = useState({
+    username: "",
+    password: "",
+  });
+
+  const { mutate } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: login,
+    onError: (err) => {
+      console.log("Something went wrong", err);
+    },
+    onSuccess: async (res) => {
+      console.log("Created successfully");
+      setIsAuthenticated(true);
+      router.dismissTo("/home");
+    },
+  });
+
   return (
     <View style={styles.container}>
       <Image
@@ -19,10 +42,22 @@ const Login = () => {
       <Text style={styles.title}>Login to Your Account</Text>
       <View style={styles.fieldsContainer}>
         <Text style={styles.fieldLabel}>Username</Text>
-        <TextInput placeholder="" style={styles.textInput} />
+        <TextInput
+          placeholder=""
+          style={styles.textInput}
+          onChangeText={(text) => setUserInfo({ ...userInfo, username: text })}
+        />
         <Text style={styles.fieldLabel}>Password</Text>
-        <TextInput placeholder="" style={styles.textInput} />
-        <TouchableOpacity style={styles.loginButton}>
+        <TextInput
+          secureTextEntry
+          placeholder=""
+          style={styles.textInput}
+          onChangeText={(text) => setUserInfo({ ...userInfo, password: text })}
+        />
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => mutate(userInfo)}
+        >
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
       </View>
@@ -34,6 +69,7 @@ const Login = () => {
           Don&apos;t have an account?
         </Text>
         <Text style={styles.createAccountText}> Create Account</Text>
+        <Button title="Home" onPress={() => router.push("/(protected)/home")} />
       </TouchableOpacity>
     </View>
   );
@@ -76,6 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 10,
     marginVertical: 5,
+    color: "#deddd1ff",
   },
   loginButton: {
     borderRadius: 10,
