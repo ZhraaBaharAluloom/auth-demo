@@ -5,14 +5,21 @@ interface UserInfo {
   password: string;
 }
 
+interface RegisterInfo {
+  image: string;
+  username: string;
+  password: string;
+}
+
 const loginApi = async (userInfo: UserInfo) => {
   const { data } = await instance.post("/auth/login", userInfo);
   storeToken(data.token);
   return data;
 };
 
-const register = async (userInfo: UserInfo) => {
+const register = async (userInfo: FormData) => {
   const { data } = await instance.post("/auth/register", userInfo);
+  storeToken(data.token);
   return data;
 };
 
