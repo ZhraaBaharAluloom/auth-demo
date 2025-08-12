@@ -1,6 +1,8 @@
+import { signup } from "@/api/auth";
+import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +11,25 @@ import {
   View,
 } from "react-native";
 const Signup = () => {
+  const [userInfo, setUserInfo] = useState({
+    username: "",
+    password: "",
+    image: "",
+  });
+  console.log("🚀 ~ Signup ~ userInfo:", userInfo);
+
+  // cosnt userInfo = {
+  //   username: "",
+  //   password: "",
+  //   Image: "",
+  // }
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: signup,
+    onSuccess: (data) => {
+      console.log("Sign up successfully:", data);
+    },
+  });
   return (
     <View style={styles.container}>
       <Image
@@ -19,10 +40,25 @@ const Signup = () => {
       <Text style={styles.title}>Create a New Account</Text>
       <View style={styles.fieldsContainer}>
         <Text style={styles.fieldLabel}>Username</Text>
-        <TextInput placeholder="" style={styles.textInput} />
+        <TextInput
+          placeholder=""
+          style={styles.textInput}
+          onChangeText={(text) => {
+            setUserInfo({ ...userInfo, username: text });
+          }}
+        />
         <Text style={styles.fieldLabel}>Password</Text>
-        <TextInput placeholder="" style={styles.textInput} />
-        <TouchableOpacity style={styles.loginButton}>
+        <TextInput
+          placeholder=""
+          style={styles.textInput}
+          onChangeText={(text) => {
+            setUserInfo({ ...userInfo, password: text });
+          }}
+        />
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => mutate(userInfo)}
+        >
           <Text style={styles.loginText}>Signup</Text>
         </TouchableOpacity>
       </View>
