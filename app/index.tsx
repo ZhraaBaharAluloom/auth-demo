@@ -1,5 +1,5 @@
-import Login from "@/components/Auth/Login";
+import LoginPage from "@/components/Auth/Login";
 
 export default function Index() {
-  return <Login />;
+  return <LoginPage />;
 }

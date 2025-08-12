@@ -1,6 +1,10 @@
+import { register } from "@/api/auth";
+import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
+
 import {
   StyleSheet,
   Text,
@@ -9,6 +13,47 @@ import {
   View,
 } from "react-native";
 const Signup = () => {
+  const [userInfo, setUserInfo] = useState({
+    username: "",
+    password: "",
+    image: "",
+  });
+  const { mutate } = useMutation({
+    mutationKey: ["register"],
+    mutationFn: register,
+    onSuccess: (data) => {
+      console.log("YIPPPEEEE UR REGISTERED LESSGOOO:", data.token);
+    },
+    onError: (err) => {
+      console.error("whoopsiess, somthins wrong", err);
+    },
+  });
+
+  const pickImage = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!res.canceled) {
+      const pic: string = res.assets[0].uri;
+      setUserInfo({ ...userInfo, image: pic });
+    }
+
+    console.log(res);
+  };
+
+  const handleRegister = async () => {
+    const formData = new FormData();
+    formData.append("username", userInfo.username);
+    formData.append("password", userInfo.password);
+    formData.append("image", userInfo.image);
+
+    mutate(formData);
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -17,12 +62,42 @@ const Signup = () => {
         style={styles.imgStyle}
       />
       <Text style={styles.title}>Create a New Account</Text>
+
+      <View>
+        {userInfo.image.length === 0 ? (
+          <TouchableOpacity onPress={() => pickImage()}>
+            <Text
+              style={{
+                color: "white",
+              }}
+            >
+              Upload image plz
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <Image
+            source={{ uri: userInfo.image }}
+            style={{ height: 100, width: 100, borderRadius: 100 }}
+          />
+        )}
+      </View>
       <View style={styles.fieldsContainer}>
         <Text style={styles.fieldLabel}>Username</Text>
-        <TextInput placeholder="" style={styles.textInput} />
+        <TextInput
+          onChangeText={(text) => setUserInfo({ ...userInfo, username: text })}
+          placeholder=""
+          style={styles.textInput}
+        />
         <Text style={styles.fieldLabel}>Password</Text>
-        <TextInput placeholder="" style={styles.textInput} />
-        <TouchableOpacity style={styles.loginButton}>
+        <TextInput
+          onChangeText={(text) => setUserInfo({ ...userInfo, password: text })}
+          placeholder=""
+          style={styles.textInput}
+        />
+        <TouchableOpacity
+          onPress={() => handleRegister()}
+          style={styles.loginButton}
+        >
           <Text style={styles.loginText}>Signup</Text>
         </TouchableOpacity>
       </View>
