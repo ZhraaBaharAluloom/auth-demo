@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 interface UserInfo {
   user: string;
   password: string;
