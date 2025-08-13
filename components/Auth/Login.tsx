@@ -1,4 +1,3 @@
-import { storeToken } from "@/api/storage";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -22,8 +21,9 @@ const Login = () => {
   const { mutate } = useMutation({
     mutationKey: ["login"],
     mutationFn: login,
-    onSuccess: async (response) => {
-      if (response?.accessToken) await storeToken(response.accessToken);
+    onSuccess: async () => {
+      router.push("/(protected)/(tabs)");
+      console.log("Successfully created");
     },
     onError: (err) => {
       console.log("Something went wrong", err);
@@ -72,6 +72,12 @@ const Login = () => {
           Don&apos;t have an account?
         </Text>
         <Text style={styles.createAccountText}> Create Account</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.aboutContainer}
+        onPress={() => router.push("/about")}
+      >
+        <Text style={styles.aboutText}>More about Blog</Text>
       </TouchableOpacity>
     </View>
   );
@@ -138,5 +144,11 @@ const styles = StyleSheet.create({
   },
   createAccountText: {
     color: "#FE8723",
+  },
+  aboutContainer: {},
+  aboutText: {
+    color: "#deddd1ff",
+    fontSize: 20,
+    textDecorationLine: "underline",
   },
 });
