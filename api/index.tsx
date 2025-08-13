@@ -1,5 +1,17 @@
 import axios from "axios";
+import { getToken } from "./storage";
 
-export const instance = axios.create({
+const instance = axios.create({
   baseURL: "https://react-native-food-delivery-be.eapi.joincoded.com/api",
 });
+
+instance.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+export { instance };
