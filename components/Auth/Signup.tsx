@@ -1,4 +1,6 @@
+import { register } from "@/api/auth";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
@@ -12,7 +14,7 @@ import {
   View,
 } from "react-native";
 const Signup = () => {
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string>(String);
   const [username, setUser] = useState("");
   const [password, setPassword] = useState("");
 
@@ -30,7 +32,22 @@ const Signup = () => {
       setImage(result.assets[0].uri);
     }
   };
-
+  const { data, mutate } = useMutation({
+    mutationKey: ["SignUp"],
+    mutationFn: register,
+  });
+  interface User {
+    username: string;
+    password: string;
+    image: string;
+  }
+  const handlesubmit = () => {
+    const formdata = new FormData();
+    formdata.append("username", username);
+    formdata.append("password", password);
+    formdata.append("image", image);
+    mutate(formdata);
+  };
   return (
     <ScrollView style={{ backgroundColor: "#2D2E2F" }}>
       <View style={styles.container}>
@@ -76,7 +93,7 @@ const Signup = () => {
             />
             <Text style={{ color: "white" }}>Upload your image </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity style={styles.loginButton} onPress={handlesubmit}>
             <Text style={styles.loginText}>Signup</Text>
           </TouchableOpacity>
         </View>
@@ -130,6 +147,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 10,
     marginVertical: 5,
+    color: "white",
   },
   loginButton: {
     borderRadius: 10,

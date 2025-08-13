@@ -1,4 +1,5 @@
 import { login } from "@/api/auth";
+import { storeToken } from "@/api/storage";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -25,7 +26,9 @@ const Login = () => {
     onError: (err) => {
       console.log(err);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      if (data?.accessToken) await storeToken(data.accessToken);
+
       console.log(data);
     },
   });
