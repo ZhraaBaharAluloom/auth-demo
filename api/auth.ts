@@ -1,15 +1,16 @@
-import instance from ".";
-import { storeToken } from "./storage";
+import { instance } from ".";
 
-interface userCredential {
+type userInfoTypes = {
   username: string;
   password: string;
-}
+};
 
-const login = async (userInfo: userCredential) => {
+export const login = async (userInfo: userInfoTypes) => {
   const res = await instance.post("/auth/login", userInfo);
-  await storeToken(res.data.token);
   return res.data;
 };
 
-export { login };
+export const register = async (formData: FormData) => {
+  const res = await instance.post("/auth/register", formData);
+  return res.data;
+};

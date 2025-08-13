@@ -1,3 +1,4 @@
+import { storeToken } from "@/api/storage";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -13,7 +14,7 @@ import {
 import { login } from "@/api/auth";
 
 const Login = () => {
-  const [userInfo, setUserInfo] = useState({
+  const [userCredentials, setUserCredentials] = useState({
     username: "",
     password: "",
   });
@@ -21,11 +22,11 @@ const Login = () => {
   const { mutate } = useMutation({
     mutationKey: ["login"],
     mutationFn: login,
+    onSuccess: async (response) => {
+      if (response?.accessToken) await storeToken(response.accessToken);
+    },
     onError: (err) => {
       console.log("Something went wrong", err);
-    },
-    onSuccess: async (res) => {
-      router.push("/home");
     },
   });
 
@@ -42,18 +43,23 @@ const Login = () => {
         <TextInput
           placeholder=""
           style={styles.textInput}
-          onChangeText={(text) => setUserInfo({ ...userInfo, username: text })}
+          onChangeText={(text) =>
+            setUserCredentials({ ...userCredentials, username: text })
+          }
         />
         <Text style={styles.fieldLabel}>Password</Text>
         <TextInput
-          secureTextEntry
           placeholder=""
+          textContentType="password"
+          secureTextEntry
           style={styles.textInput}
-          onChangeText={(text) => setUserInfo({ ...userInfo, password: text })}
+          onChangeText={(text) =>
+            setUserCredentials({ ...userCredentials, password: text })
+          }
         />
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => mutate(userInfo)}
+          onPress={() => mutate(userCredentials)}
         >
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
@@ -109,6 +115,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginVertical: 5,
     color: "#deddd1ff",
+    padding: 3,
   },
   loginButton: {
     borderRadius: 10,
