@@ -1,19 +1,18 @@
-import { login } from "@/api/auth";
-import AuthContext from "@/contexts/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
-  Button,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { login } from "@/api/auth";
+
 const Login = () => {
-  const { setIsAuthenticated } = useContext(AuthContext);
   const [userInfo, setUserInfo] = useState({
     username: "",
     password: "",
@@ -26,9 +25,7 @@ const Login = () => {
       console.log("Something went wrong", err);
     },
     onSuccess: async (res) => {
-      console.log("Created successfully");
-      setIsAuthenticated(true);
-      router.dismissTo("/home");
+      router.push("/home");
     },
   });
 
@@ -69,7 +66,6 @@ const Login = () => {
           Don&apos;t have an account?
         </Text>
         <Text style={styles.createAccountText}> Create Account</Text>
-        <Button title="Home" onPress={() => router.push("/(protected)/home")} />
       </TouchableOpacity>
     </View>
   );
