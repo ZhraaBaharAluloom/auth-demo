@@ -1,3 +1,5 @@
+import { login } from "@/api/auth";
+import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -14,6 +16,12 @@ const Login = () => {
     username: "",
     password: "",
   });
+
+  const { mutate, data } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: login,
+  });
+  console.log("🚀 ~ Login ~ data:", data);
 
   return (
     <View style={styles.container}>
@@ -42,7 +50,10 @@ const Login = () => {
             setUserCredentials({ ...userCredentials, password: text })
           }
         />
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => mutate(userCredentials)}
+        >
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
       </View>

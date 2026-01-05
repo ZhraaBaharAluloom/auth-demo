@@ -1,8 +1,6 @@
-import Feather from "@expo/vector-icons/Feather";
 import { Image } from "expo-image";
-import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 
 import {
   StyleSheet,
@@ -12,35 +10,6 @@ import {
   View,
 } from "react-native";
 const Signup = () => {
-  const [image, setImage] =
-    useState<ImagePicker.ImagePickerSuccessResult | null>(null);
-
-  const [userCredentials, setUserCredentials] = useState({
-    username: "",
-    password: "",
-    image: "",
-  });
-  const pickImage = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      alert("Permission required");
-      return;
-    }
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Image
@@ -50,7 +19,7 @@ const Signup = () => {
       />
       <Text style={styles.title}>Create a New Account</Text>
       <View style={styles.fieldsContainer}>
-        {image ? (
+        {/* {image ? (
           <Image
             style={{ width: 100, height: 100, borderRadius: "100%" }}
             source={{ uri: image?.assets[0]?.uri }}
@@ -60,24 +29,15 @@ const Signup = () => {
             <Feather name="upload-cloud" size={24} color="#deddd1ff" />
             <Text style={styles.uploadImageLabel}>Upload profile image</Text>
           </TouchableOpacity>
-        )}
+        )} */}
         <Text style={styles.fieldLabel}>Username</Text>
-        <TextInput
-          placeholder=""
-          style={styles.textInput}
-          onChangeText={(text) =>
-            setUserCredentials({ ...userCredentials, username: text })
-          }
-        />
+        <TextInput placeholder="" style={styles.textInput} />
         <Text style={styles.fieldLabel}>Password</Text>
         <TextInput
           placeholder=""
           textContentType="password"
           secureTextEntry
           style={styles.textInput}
-          onChangeText={(text) =>
-            setUserCredentials({ ...userCredentials, password: text })
-          }
         />
         <TouchableOpacity style={styles.loginButton}>
           <Text style={styles.loginText}>Signup</Text>
