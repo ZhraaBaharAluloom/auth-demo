@@ -1,39 +1,37 @@
 import { getToken } from "@/api/storage";
-import AuthContext from "@/utils/authContext";
+import AuthContext from "@/utils/contexts/authContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
-
+import { ActivityIndicator } from "react-native";
 export default function RootLayout() {
   const queryClient = new QueryClient();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isReady, setIsReady] = useState(false);
 
-  console.log("🚀 ~ RootLayout ~ isAuthenticated:", isAuthenticated);
+  const [ready, setReady] = useState(false);
+  console.log(isAuthenticated);
 
+  const checkToken = async () => {
+    const token = await getToken();
+    if (token) {
+      setIsAuthenticated(true);
+    }
+    setReady(true);
+  };
   useEffect(() => {
-    const checkToken = async () => {
-      const token = await getToken();
-      console.log("🚀 ~ checkToken ~ token:", token);
-      if (token) setIsAuthenticated(true);
-      else setIsAuthenticated(false);
-      setIsReady(true);
-    };
     checkToken();
-  });
-
-  if (!isReady) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color={"orange"} />
-      </View>
-    );
+  }, []);
+  if (!ready) {
+    return <ActivityIndicator />;
   }
-
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+      <AuthContext.Provider
+        value={{
+          isAuthenticated,
+          setIsAuthenticated,
+        }}
+      >
         <Stack>
           <Stack.Screen
             name="login"

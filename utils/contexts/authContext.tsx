@@ -1,12 +1,13 @@
 import { createContext } from "react";
 
-interface AuthContextProps {
+interface AuthState {
   isAuthenticated: boolean;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
-const AuthContext = createContext<AuthContextProps>({
+const AuthContext = createContext<AuthState>({
   isAuthenticated: false,
   setIsAuthenticated: () => {},
 });
+
 export default AuthContext;

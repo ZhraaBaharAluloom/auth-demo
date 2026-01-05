@@ -28,7 +28,7 @@ const HomeItem = ({ item }: HomeItemProps) => {
 
             <View style={styles.likesContainer}>
               <Text>{item.likes}</Text>
-              <AntDesign name="like1" size={20} color="gray" />
+              <AntDesign name="like" size={20} color="gray" />
             </View>
           </View>
         </View>

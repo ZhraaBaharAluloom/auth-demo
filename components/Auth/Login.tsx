@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,17 +11,19 @@ import {
 } from "react-native";
 
 import { login } from "@/api/auth";
+import AuthContext from "@/utils/contexts/authContext";
 
 const Login = () => {
   const [userCredentials, setUserCredentials] = useState({
     username: "",
     password: "",
   });
-
+  const { setIsAuthenticated } = useContext(AuthContext);
   const { mutate } = useMutation({
     mutationKey: ["login"],
     mutationFn: login,
     onSuccess: async () => {
+      setIsAuthenticated(true);
       router.push("/(protected)/(tabs)");
       console.log("Successfully created");
     },
