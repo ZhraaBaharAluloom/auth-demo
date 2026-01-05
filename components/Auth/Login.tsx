@@ -1,7 +1,6 @@
-import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,26 +9,10 @@ import {
   View,
 } from "react-native";
 
-import { login } from "@/api/auth";
-import AuthContext from "@/utils/contexts/authContext";
-
 const Login = () => {
   const [userCredentials, setUserCredentials] = useState({
     username: "",
     password: "",
-  });
-  const { setIsAuthenticated } = useContext(AuthContext);
-  const { mutate } = useMutation({
-    mutationKey: ["login"],
-    mutationFn: login,
-    onSuccess: async () => {
-      setIsAuthenticated(true);
-      router.push("/(protected)/(tabs)");
-      console.log("Successfully created");
-    },
-    onError: (err) => {
-      console.log("Something went wrong", err);
-    },
   });
 
   return (
@@ -59,10 +42,7 @@ const Login = () => {
             setUserCredentials({ ...userCredentials, password: text })
           }
         />
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => mutate(userCredentials)}
-        >
+        <TouchableOpacity style={styles.loginButton}>
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
       </View>
@@ -79,7 +59,7 @@ const Login = () => {
         style={styles.aboutContainer}
         onPress={() => router.push("/about")}
       >
-        <Text style={styles.aboutText}>More about Blog</Text>
+        <Text style={styles.aboutText}>More about Foodie?</Text>
       </TouchableOpacity>
     </View>
   );

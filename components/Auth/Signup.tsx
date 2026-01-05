@@ -1,6 +1,4 @@
-import { register } from "@/api/auth";
 import Feather from "@expo/vector-icons/Feather";
-import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
@@ -43,39 +41,6 @@ const Signup = () => {
     }
   };
 
-  const { mutate } = useMutation({
-    mutationKey: ["signup"],
-    mutationFn: register,
-    onError: (err) => {
-      console.log("Could not create an account", err);
-    },
-    onSuccess: () => {
-      console.log("Account created successfully");
-    },
-  });
-
-  const handleSubmit = () => {
-    if (!userCredentials.username || !userCredentials.password) {
-      alert("Please fill username and password");
-      return;
-    }
-    if (!image) {
-      alert("Please select a profile image");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("username", userCredentials.username);
-    formData.append("password", userCredentials.password);
-    formData.append("profileImage", {
-      uri: image,
-      name: image.assets[0].fileName,
-      type: image.assets[0].mimeType,
-    } as any);
-
-    mutate(formData);
-  };
-
   return (
     <View style={styles.container}>
       <Image
@@ -114,7 +79,7 @@ const Signup = () => {
             setUserCredentials({ ...userCredentials, password: text })
           }
         />
-        <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
+        <TouchableOpacity style={styles.loginButton}>
           <Text style={styles.loginText}>Signup</Text>
         </TouchableOpacity>
       </View>
