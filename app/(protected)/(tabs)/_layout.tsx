@@ -11,6 +11,7 @@ const TabsLayout = () => {
         tabBarStyle: {
           backgroundColor: "#2D2E2F",
           borderTopWidth: 0,
+          paddingTop: 5,
         },
         headerStyle: {
           backgroundColor: "#2D2E2F",
@@ -24,6 +25,7 @@ const TabsLayout = () => {
         name="index"
         options={{
           title: "Restaurants",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="restaurant" size={24} color={color} />
           ),
@@ -33,8 +35,19 @@ const TabsLayout = () => {
         name="profile"
         options={{
           title: "Profile",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="person" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="about"
+        options={{
+          title: "About",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="information-circle" size={24} color={color} />
           ),
         }}
       />
