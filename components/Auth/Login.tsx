@@ -1,8 +1,10 @@
 import { login } from "@/api/auth";
+import { storeToken } from "@/api/storage";
+import AuthContext from "@/utils/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -17,10 +19,20 @@ const Login = () => {
     password: "",
   });
 
-  const { mutate, data } = useMutation({
+  const { setIsAuthenticated } = useContext(AuthContext);
+
+  const { mutate, data, isError, error } = useMutation({
     mutationKey: ["login"],
     mutationFn: login,
+    onSuccess: (data) => {
+      console.log("🚀 ~ Login ~ data.token:", data.token);
+      storeToken(data.token);
+      setIsAuthenticated(true);
+      router.navigate("/(protected)/(tabs)");
+    },
   });
+  console.log("🚀 ~ Login ~ error:", error);
+  console.log("🚀 ~ Login ~ isError:", isError);
   console.log("🚀 ~ Login ~ data:", data);
 
   return (
