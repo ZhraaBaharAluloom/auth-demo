@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 interface AuthContextProps {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | null;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 

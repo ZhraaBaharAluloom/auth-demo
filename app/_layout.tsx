@@ -7,21 +7,25 @@ import { useEffect, useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 export default function RootLayout() {
   const queryClient = new QueryClient();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+
+  const [isAuthenticated, setIsAuthenticated] = useState<null | boolean>(null);
 
   const checkToken = async () => {
     const token = await getItemAsync("token");
-    if (token) setIsAuthenticated(true);
-    else setIsAuthenticated(false);
-    setIsReady(true);
+    if (token) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+
+    // setIsAuthenticated(!!token);
   };
 
   useEffect(() => {
     checkToken();
-  }, [isAuthenticated]);
+  }, []);
 
-  if (!isReady) return <Spinner size="large" color={"gray"} />;
+  if (isAuthenticated === null) return <Spinner size="large" color={"gray"} />;
 
   return (
     <SafeAreaProvider>
