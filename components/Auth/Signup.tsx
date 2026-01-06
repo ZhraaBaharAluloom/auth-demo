@@ -1,14 +1,9 @@
-import { signup } from "@/api/auth";
-import { storeToken } from "@/api/storage";
-import AuthContext from "@/utils/AuthContext";
 import Feather from "@expo/vector-icons/Feather";
-import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -32,72 +27,6 @@ const Signup = () => {
     password: "",
     image: null,
   });
-  const { setIsAuthenticated } = useContext(AuthContext);
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library.
-    // Manually request permissions for videos on iOS when `allowsEditing` is set to `false`
-    // and `videoExportPreset` is `'Passthrough'` (the default), ideally before launching the picker
-    // so the app users aren't surprised by a system dialog after picking a video.
-    // See "Invoke permissions for videos" sub section for more details.
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permissionResult.granted) {
-      Alert.alert(
-        "Permission required",
-        "Permission to access the media library is required."
-      );
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.5,
-    });
-
-    if (!result.canceled) {
-      setUserCredentials({ ...userCredentials, image: result });
-    }
-  };
-
-  const { mutate, isError, error, data, isPending } = useMutation({
-    mutationKey: ["signup"],
-    mutationFn: signup,
-    onSuccess: (data) => {
-      storeToken(data.token);
-      setIsAuthenticated(true);
-      router.navigate("/(protected)/(tabs)");
-    },
-    onError: (err) => {
-      console.log(err);
-    },
-  });
-
-  const handleSignup = () => {
-    if (!userCredentials.username || !userCredentials.password) {
-      Alert.alert("Error", "Username and password are required");
-      return;
-    }
-
-    const formData = new FormData();
-    const profileImage = userCredentials.image;
-
-    formData.append("username", userCredentials.username);
-    formData.append("password", userCredentials.password);
-
-    if (profileImage && profileImage.assets && profileImage.assets.length > 0) {
-      formData.append("image", {
-        uri: profileImage.assets[0].uri,
-        name: profileImage.assets[0].fileName || "profile.jpg",
-        type: profileImage.assets[0].type || "image/jpeg",
-      } as any);
-    }
-
-    mutate(formData);
-  };
 
   return (
     <KeyboardAvoidingView
@@ -120,10 +49,7 @@ const Signup = () => {
                 source={{ uri: userCredentials.image.assets[0].uri }}
               />
             ) : (
-              <TouchableOpacity
-                onPress={pickImage}
-                style={styles.imgPickerStyle}
-              >
+              <TouchableOpacity style={styles.imgPickerStyle}>
                 <Feather name="upload-cloud" size={24} color="#deddd1ff" />
                 <Text style={styles.uploadImageLabel}>
                   Upload profile image
@@ -149,16 +75,8 @@ const Signup = () => {
               }
             />
 
-            {isError && <Text style={styles.error}>Something went wrong</Text>}
-
-            <TouchableOpacity
-              style={styles.loginButton}
-              onPress={handleSignup}
-              disabled={isPending}
-            >
-              <Text style={styles.loginText}>
-                {isPending ? "Creating an account ..." : "Signup"}
-              </Text>
+            <TouchableOpacity style={styles.loginButton}>
+              <Text style={styles.loginText}>Signup</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity

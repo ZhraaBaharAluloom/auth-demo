@@ -1,50 +1,95 @@
-# Welcome to your Expo app 👋
+# Storing and Managing Auth Token with Expo SecureStore
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Now that we have the token from the login function, we need to store it so that refreshing the app doesn't log the user out every time.
 
-## Get started
+We'll use **Expo SecureStore** ([docs](https://docs.expo.dev/versions/latest/sdk/securestore/)) to securely store the token on the device. Inshallah, we all know how to read documentation; Inshallah ya3ni. 🙂
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 1. Install SecureStore
 
-2. Start the app
+Install the package using the command from the Expo SecureStore documentation.
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 2. Create Storage File
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Inside the `api/` folder, create a new file `api/storage.ts`.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 3. Add Token Functions
 
-When you're ready, run:
+Inside `storage.ts`, add three functions to manage the token:
 
-```bash
-npm run reset-project
+- `storeToken` – store the token securely
+- `getToken` – retrieve the token when needed
+- `deleteToken` – remove the token when it expires or when the user logs out
+
+_(Refer to the Expo Secure Store page on Notion for exact implementation. ☺️)_
+
+---
+
+## 4. Store Token on Login
+
+Call `storeToken` when the user successfully logs in.  
+Take a moment to locate the screen where the login function is handled and integrate it there.
+
+---
+
+## 5. Check Token on App Launch
+
+In the root `_layout.tsx`:
+
+1.  Create a state:
+    I guess you know how to create a state?
+
+```ts
+const [isAuthenticated, setIsAuthenticated] = useState(null);
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2.  Create an async function to check for the token:
 
-## Learn more
+```ts
+const checkToken = async () => {
+  // 1. get your token using getToken()
+  // 2. Add your condition here
+};
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+3.  Run this function once on app launch using useEffect:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```ts
+useEffect(() => {
+  //   Call the function above
+}, []);
+```
 
-## Join the community
+4.  Handle the nullable value of isAuthenticated on first launch.
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 6. Make Auth State Global
+
+Since other components don’t know about this state, we need to make it global:
+
+1.  Create a folder at the root: `utils/`
+2.  Inside `utils/`, create `AuthContext.tsx`
+3.  Create a context to manage `isAuthenticated` globally
+4.  Wrap the root layout with `AuthContext.Provider`
+5.  Pass `isAuthenticated` and `setIsAuthenticated` to the provider
+6.  Use `setIsAuthenticated` in `login`/`signup` to update the global state:
+    ```ts
+    const { setIsAuthenticated } = useContext(AuthContext);
+    ```
+
+---
+
+## 7. Protect Routes
+
+1.  Create a folder `protect/` inside the `app` folder
+2.  Wrap your routes in the main layout with `<Stack.Protected guard={}>` and set the `guard` prop with the `isAuthenticated` value.
+
+### 🎉 Tada!
+
+Everything should now work. If not, grab a coffee or tea, take a walk, and enjoy the vibes. :)

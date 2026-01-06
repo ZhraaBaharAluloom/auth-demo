@@ -1,12 +1,9 @@
 import { login } from "@/api/auth";
-import { storeToken } from "@/api/storage";
-import AuthContext from "@/utils/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -24,21 +21,15 @@ const Login = () => {
     password: "",
   });
 
-  const { setIsAuthenticated } = useContext(AuthContext);
-
-  const { mutate, isError, isPending, error } = useMutation({
+  const { mutate, isError, isPending } = useMutation({
     mutationKey: ["login"],
     mutationFn: login,
     onSuccess: (data) => {
-      storeToken(data.token);
-      setIsAuthenticated(true);
-      router.navigate("/(protected)/(tabs)");
       setUserCredentials({ ...userCredentials, username: "", password: "" });
     },
   });
 
   const handleLogin = () => {
-    if (!userCredentials.username) return Alert.alert("username required");
     mutate(userCredentials);
   };
 

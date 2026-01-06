@@ -1,40 +1,26 @@
-import { getProfile } from "@/api/profile";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { deleteItemAsync } from "expo-secure-store";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
-import Spinner from "../Loading/Spinner";
 const Profile = () => {
   const userName = "Foodie Master";
   const userImage =
     "https://static.vecteezy.com/system/resources/thumbnails/044/651/262/small/a-cute-yellow-chick-looks-curiously-at-the-viewer-png.png"; // Placeholder image
   const foodQuote = "I'm on a seafood diet. I see food and I eat it.";
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["profile"],
-    queryFn: getProfile,
-  });
-
-  const logout = async () => {
-    await deleteItemAsync("token");
-    router.dismissTo("/login");
-  };
-
-  if (isLoading) return <Spinner size="large" color={"gray"} />;
-
   return (
     <View style={styles.container}>
       <View style={styles.logoutContainer}>
-        <MaterialIcons name="logout" size={24} color="red" onPress={logout} />
+        <MaterialIcons
+          name="logout"
+          size={24}
+          color="red"
+          onPress={() => router.dismissTo("/login")}
+        />
       </View>
       <View style={styles.infoContainer}>
-        <Image
-          source={{ uri: data?.image || userImage }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.userName}>{data?.username || userName}</Text>
+        <Image source={{ uri: userImage }} style={styles.profileImage} />
+        <Text style={styles.userName}>{userName}</Text>
         <Text style={styles.welcomeText}>Welcome!</Text>
         <Text style={styles.quoteText}>{foodQuote}</Text>
       </View>
