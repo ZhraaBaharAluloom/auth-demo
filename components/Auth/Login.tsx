@@ -55,6 +55,7 @@ const Login = () => {
             source={require("@/assets/images/login.png")}
             style={styles.imgStyle}
           />
+
           <Text style={styles.title}>Login to Your Account</Text>
 
           <View style={styles.fieldsContainer}>
