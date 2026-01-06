@@ -2,8 +2,7 @@ import * as SecureStore from "expo-secure-store";
 
 const storeToken = async (token: string) => {
   try {
-    const storedToken = await SecureStore.setItemAsync("token", token);
-    return storedToken;
+    await SecureStore.setItemAsync("token", token);
   } catch (error) {
     console.log("🚀 ~ storeToken ~ error:", error);
   }

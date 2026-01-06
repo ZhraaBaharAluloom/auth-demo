@@ -9,10 +9,14 @@ import { router } from "expo-router";
 import React, { useContext, useState } from "react";
 import {
   Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 
@@ -28,7 +32,6 @@ const Signup = () => {
     password: "",
     image: null,
   });
-  console.log("🚀 ~ Signup ~ userCredentials:", userCredentials);
   const { setIsAuthenticated } = useContext(AuthContext);
 
   const pickImage = async () => {
@@ -55,8 +58,6 @@ const Signup = () => {
       quality: 0.5,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setUserCredentials({ ...userCredentials, image: result });
     }
@@ -66,8 +67,6 @@ const Signup = () => {
     mutationKey: ["signup"],
     mutationFn: signup,
     onSuccess: (data) => {
-      console.log("🚀 ~ Signup ~ data:", data);
-      console.log("first");
       storeToken(data.token);
       setIsAuthenticated(true);
       router.navigate("/(protected)/(tabs)");
@@ -76,13 +75,8 @@ const Signup = () => {
       console.log(err);
     },
   });
-  console.log("🚀 ~ Signup ~ data:", data);
-  console.log("🚀 ~ Signup ~ error:", error);
-  console.log("🚀 ~ Signup ~ isError:", isError);
 
   const handleSignup = () => {
-    console.log("second");
-
     if (!userCredentials.username || !userCredentials.password) {
       Alert.alert("Error", "Username and password are required");
       return;
@@ -106,61 +100,79 @@ const Signup = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        contentFit="contain"
-        source={require("@/assets/images/login.png")}
-        style={styles.imgStyle}
-      />
-      <Text style={styles.title}>Create a New Account</Text>
-      <View style={styles.fieldsContainer}>
-        {userCredentials.image ? (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={100}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
           <Image
-            style={{ width: 100, height: 100, borderRadius: "100%" }}
-            source={{ uri: userCredentials.image.assets[0].uri }}
+            contentFit="contain"
+            source={require("@/assets/images/login.png")}
+            style={styles.imgStyle}
           />
-        ) : (
-          <TouchableOpacity onPress={pickImage} style={styles.imgPickerStyle}>
-            <Feather name="upload-cloud" size={24} color="#deddd1ff" />
-            <Text style={styles.uploadImageLabel}>Upload profile image</Text>
+          <Text style={styles.title}>Create a New Account</Text>
+          <View style={styles.fieldsContainer}>
+            {userCredentials.image ? (
+              <Image
+                style={{ width: 100, height: 100, borderRadius: "100%" }}
+                source={{ uri: userCredentials.image.assets[0].uri }}
+              />
+            ) : (
+              <TouchableOpacity
+                onPress={pickImage}
+                style={styles.imgPickerStyle}
+              >
+                <Feather name="upload-cloud" size={24} color="#deddd1ff" />
+                <Text style={styles.uploadImageLabel}>
+                  Upload profile image
+                </Text>
+              </TouchableOpacity>
+            )}
+            <Text style={styles.fieldLabel}>Username</Text>
+            <TextInput
+              placeholder=""
+              style={styles.textInput}
+              onChangeText={(text) =>
+                setUserCredentials({ ...userCredentials, username: text })
+              }
+            />
+            <Text style={styles.fieldLabel}>Password</Text>
+            <TextInput
+              placeholder=""
+              textContentType="password"
+              secureTextEntry
+              style={styles.textInput}
+              onChangeText={(text) =>
+                setUserCredentials({ ...userCredentials, password: text })
+              }
+            />
+
+            {isError && <Text style={styles.error}>Something went wrong</Text>}
+
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={handleSignup}
+              disabled={isPending}
+            >
+              <Text style={styles.loginText}>
+                {isPending ? "Creating an account ..." : "Signup"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.createAccountContainer}
+            onPress={() => router.dismissTo("/")}
+          >
+            <Text style={styles.createAccountPrompt}>
+              Already have an account?
+            </Text>
+            <Text style={styles.createAccountText}> Login.</Text>
           </TouchableOpacity>
-        )}
-        <Text style={styles.fieldLabel}>Username</Text>
-        <TextInput
-          placeholder=""
-          style={styles.textInput}
-          onChangeText={(text) =>
-            setUserCredentials({ ...userCredentials, username: text })
-          }
-        />
-        <Text style={styles.fieldLabel}>Password</Text>
-        <TextInput
-          placeholder=""
-          textContentType="password"
-          secureTextEntry
-          style={styles.textInput}
-          onChangeText={(text) =>
-            setUserCredentials({ ...userCredentials, password: text })
-          }
-        />
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={handleSignup}
-          disabled={isPending}
-        >
-          <Text style={styles.loginText}>
-            {isPending ? "Creating an account ..." : "Signup"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity
-        style={styles.createAccountContainer}
-        onPress={() => router.dismissTo("/")}
-      >
-        <Text style={styles.createAccountPrompt}>Already have an account?</Text>
-        <Text style={styles.createAccountText}> Login.</Text>
-      </TouchableOpacity>
-    </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -215,6 +227,10 @@ const styles = StyleSheet.create({
   loginText: {
     color: "#ffffffff",
     fontSize: 20,
+  },
+  error: {
+    color: "red",
+    fontSize: 16,
   },
   createAccountContainer: {
     flexDirection: "row",

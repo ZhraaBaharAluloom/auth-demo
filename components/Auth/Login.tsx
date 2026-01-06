@@ -6,10 +6,15 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useContext, useState } from "react";
 import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 
@@ -21,70 +26,86 @@ const Login = () => {
 
   const { setIsAuthenticated } = useContext(AuthContext);
 
-  const { mutate, data, isError, error } = useMutation({
+  const { mutate, isError, isPending, error } = useMutation({
     mutationKey: ["login"],
     mutationFn: login,
     onSuccess: (data) => {
-      console.log("🚀 ~ Login ~ data.token:", data.token);
       storeToken(data.token);
       setIsAuthenticated(true);
       router.navigate("/(protected)/(tabs)");
+      setUserCredentials({ ...userCredentials, username: "", password: "" });
     },
   });
-  console.log("🚀 ~ Login ~ error:", error);
-  console.log("🚀 ~ Login ~ isError:", isError);
-  console.log("🚀 ~ Login ~ data:", data);
+
+  const handleLogin = () => {
+    if (!userCredentials.username) return Alert.alert("username required");
+    mutate(userCredentials);
+  };
 
   return (
-    <View style={styles.container}>
-      <Image
-        contentFit="contain"
-        source={require("@/assets/images/login.png")}
-        style={styles.imgStyle}
-      />
-      <Text style={styles.title}>Login to Your Account</Text>
-      <View style={styles.fieldsContainer}>
-        <Text style={styles.fieldLabel}>Username</Text>
-        <TextInput
-          placeholder=""
-          style={styles.textInput}
-          onChangeText={(text) =>
-            setUserCredentials({ ...userCredentials, username: text })
-          }
-        />
-        <Text style={styles.fieldLabel}>Password</Text>
-        <TextInput
-          placeholder=""
-          textContentType="password"
-          secureTextEntry
-          style={styles.textInput}
-          onChangeText={(text) =>
-            setUserCredentials({ ...userCredentials, password: text })
-          }
-        />
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => mutate(userCredentials)}
-        >
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity
-        style={styles.createAccountContainer}
-        onPress={() => router.push("/signup")}
-      >
-        <Text style={styles.createAccountPrompt}>
-          Don&apos;t have an account?
-        </Text>
-        <Text style={styles.createAccountText}> Create Account</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.aboutContainer}
-        onPress={() => router.push("/about")}
-      >
-        <Text style={styles.aboutText}>More about Foodie?</Text>
-      </TouchableOpacity>
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={50}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <Image
+            contentFit="contain"
+            source={require("@/assets/images/login.png")}
+            style={styles.imgStyle}
+          />
+          <Text style={styles.title}>Login to Your Account</Text>
+
+          <View style={styles.fieldsContainer}>
+            <Text style={styles.fieldLabel}>Username</Text>
+            <TextInput
+              placeholder=""
+              style={[styles.textInput, isPending && styles.disabledTextInput]}
+              value={userCredentials.username}
+              onChangeText={(text) =>
+                setUserCredentials({ ...userCredentials, username: text })
+              }
+              editable={!isPending}
+            />
+            <Text style={styles.fieldLabel}>Password</Text>
+            <TextInput
+              placeholder=""
+              textContentType="password"
+              secureTextEntry
+              style={[styles.textInput, isPending && styles.disabledTextInput]}
+              value={userCredentials.password}
+              onChangeText={(text) =>
+                setUserCredentials({ ...userCredentials, password: text })
+              }
+              editable={!isPending}
+            />
+            {isError && <Text style={styles.error}>Something went wrong</Text>}
+
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <Text style={styles.loginText}>
+                {isPending ? "Login..." : "Login"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.createAccountContainer}
+            onPress={() => router.push("/signup")}
+          >
+            <Text style={styles.createAccountPrompt}>
+              Don&apos;t have an account?
+            </Text>
+            <Text style={styles.createAccountText}> Create Account</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.aboutContainer}
+            onPress={() => router.push("/about")}
+          >
+            <Text style={styles.aboutText}>More about Foodie?</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -108,6 +129,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     paddingVertical: 10,
   },
+  error: {
+    color: "red",
+    fontSize: 16,
+  },
   fieldsContainer: {
     width: 300,
     alignItems: "center",
@@ -127,6 +152,9 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     color: "#deddd1ff",
     padding: 3,
+  },
+  disabledTextInput: {
+    backgroundColor: "gray",
   },
   loginButton: {
     borderRadius: 10,

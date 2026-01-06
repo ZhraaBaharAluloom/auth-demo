@@ -7,12 +7,6 @@ export const login = async (userInfo: UserInfoTypes) => {
 };
 
 export const signup = async (userInfo: FormData) => {
-  try {
-    console.log("🚀 ~ auth ~ userInfo:", userInfo);
-    const response = await instance.post("/auth/register", userInfo);
-    console.log("🚀 ~ signup ~ response:", response);
-    return response.data;
-  } catch (error) {
-    console.log("🚀 ~ signup ~ error:", error);
-  }
+  const response = await instance.post("/auth/register", userInfo);
+  return response.data;
 };
